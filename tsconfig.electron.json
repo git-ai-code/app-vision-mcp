@@ -1,0 +1,33 @@
+{
+  // === ベース設定継承 ===
+  "extends": "./tsconfig.json",                // tsconfig.jsonの設定を継承
+
+  "compilerOptions": {
+    // === Electronメイン固有の出力設定 ===
+    "outDir": "./dist/electron",               // Electronアプリ用の出力ディレクトリ
+    "target": "ES2022",                        // ベース設定を明示的に指定
+    "module": "CommonJS",                      // Node.js互換のCommonJS形式（Electronメイン必須）
+    "moduleResolution": "node",                // Node.js形式のモジュール解決
+
+    // === 利用可能ライブラリ設定 ===
+    "lib": ["ES2022"],                         // ES2022のみ（DOM不要、サーバーサイド環境）
+
+    // === 型定義設定 ===
+    "types": ["node", "electron"],             // Node.js APIとElectron APIの型定義を使用
+    "skipLibCheck": true                       // 高速化のためライブラリ型チェックをスキップ
+  },
+
+  // === コンパイル対象（Electronメインプロセス） ===
+  "include": [
+    "src/electron/**/*",                       // Electronフォルダ下のすべてのファイル
+    "src/utils/**/*"                           // 共通ユーティリティファイル
+  ],
+
+  // === コンパイル除外設定 ===
+  "exclude": [
+    "src/electron/renderer/**/*",              // レンダラープロセスファイルを除外
+    "src/electron/assets/**/*",                // 静的アセットファイルを除外
+    "dist",                                    // 出力ディレクトリを除外
+    "node_modules"                             // 依存関係ライブラリを除外
+  ]
+}

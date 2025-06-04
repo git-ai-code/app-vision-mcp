@@ -1,0 +1,36 @@
+{
+  // === ベース設定継承 ===
+  "extends": "./tsconfig.json",                // tsconfig.jsonの設定を継承
+
+  "compilerOptions": {
+    // === レンダラープロセス固有の出力設定 ===
+    "outDir": "./dist/electron",               // Electronアプリ用の出力ディレクトリ
+    "rootDir": "./src/electron",               // レンダラーソースファイルのルートディレクトリ
+
+    // === ブラウザ環境用モジュール設定 ===
+    "module": "ES2022",                        // モダンブラウザ対応のESModules（最新標準）
+
+    // === フロントエンド用ライブラリ設定 ===
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],  // ES2022 + DOM API（ブラウザ環境必須）
+
+    // === 型定義生成設定（レンダラーでは不要） ===
+    "declaration": false,                      // .d.tsファイル生成を無効化
+    "declarationMap": false,                   // 型定義ソースマップ生成を無効化
+
+    // === 型定義設定 ===
+    "types": ["node", "electron"]              // Node.js APIとElectron APIの型定義を使用
+  },
+
+  // === コンパイル対象（レンダラープロセス） ===
+  "include": [
+    "src/electron/renderer/**/*",              // レンダラープロセスファイル（フロントエンドUI）
+    "src/electron/preload.ts"                  // プリロードスクリプト（メイン⇔レンダラー間ブリッジ）
+  ],
+
+  // === コンパイル除外設定 ===
+  "exclude": [
+    "src/electron/main/**/*",                  // メインプロセスファイルを除外
+    "dist",                                    // 出力ディレクトリを除外
+    "node_modules"                             // 依存関係ライブラリを除外
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    // === コンパイル対象とモジュール設定 ===
+    "target": "ES2022",                        // 出力JavaScriptバージョン（モダンNode.js対応）
+    "module": "ESNext",                        // ESModules形式で出力（最新標準）
+    "moduleResolution": "node",                // Node.js形式のモジュール解決
+
+    // === モジュール互換性設定 ===
+    "allowSyntheticDefaultImports": true,      // CommonJSモジュールのdefaultインポートを許可
+    "esModuleInterop": true,                   // ES ModulesとCommonJSの相互運用性確保
+
+    // === 出力ディレクトリ設定 ===
+    "outDir": "./dist",                        // コンパイル済みファイルの出力先
+    "rootDir": "./src",                        // ソースファイルのルートディレクトリ
+
+    // === 型チェック設定 ===
+    "strict": true,                            // 厳格な型チェックを有効化（全strict系オプションを包含）
+    "noImplicitReturns": true,                 // 関数のすべてのパスで明示的なreturn必須
+
+    // === 未使用コード検出（開発時の利便性重視で無効化） ===
+    "noUnusedLocals": false,                   // 未使用ローカル変数の警告を無効化
+    "noUnusedParameters": false,               // 未使用パラメータの警告を無効化
+
+    // === 型定義生成設定 ===
+    "declaration": true,                       // .d.tsファイル（型定義）を生成
+    "declarationMap": true,                    // 型定義のソースマップを生成
+
+    // === デバッグ支援設定 ===
+    "sourceMap": true,                         // ソースマップを生成（デバッグ時にTSファイルを表示）
+
+    // === パフォーマンス・互換性設定 ===
+    "skipLibCheck": true,                      // ライブラリ型定義ファイルの型チェックをスキップ（高速化）
+    "forceConsistentCasingInFileNames": true,  // ファイル名の大文字小文字の一貫性を強制
+    "resolveJsonModule": true                  // JSONファイルのインポートを許可
+  },
+
+  // === コンパイル対象ファイル設定 ===
+  "include": [
+    "src/**/*"                                 // srcディレクトリ下のすべてのファイルを対象
+  ],
+  
+  // === コンパイル除外設定 ===
+  "exclude": [
+    "node_modules",                            // 依存関係ライブラリを除外
+    "dist",                                    // 出力ディレクトリを除外
+    "**/*.test.ts",                            // テストファイルを除外
+    "**/*.spec.ts"                             // スペックファイルを除外
+  ]
+}

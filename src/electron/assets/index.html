@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Vision MCP - Universal Visual Assistant</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <div class="header-left">
+      <h1 class="app-title">App Vision MCP</h1>
+      <span class="app-subtitle">Universal Visual Assistant</span>
+    </div>
+    <div class="header-right">
+      <div class="status-indicator" id="status-indicator">
+        <div class="status-dot" id="status-dot"></div>
+        <span class="status-text" id="status-text">停止中</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="main-content">
+    <!-- レイアウト: 左側スクリーンショット + 右側コントロール -->
+    <div class="app-layout">
+      <!-- 左側: 大型スクリーンショットエリア -->
+      <section class="screenshot-main" aria-labelledby="screenshot-heading">
+        <div class="panel-header">
+          <h2 id="screenshot-heading">画面キャプチャ</h2>
+          <div class="panel-info" id="capture-info">
+            <span class="info-item">最終更新: <span id="last-update">なし</span></span>
+          </div>
+        </div>
+        
+        <div class="screenshot-container" id="screenshot-container">
+          <div class="placeholder-content">
+            <div class="placeholder-icon">📱</div>
+            <p class="placeholder-text">キャプチャを準備してください</p>
+            <p class="placeholder-subtitle">監視対象アプリケーションを選択し、キャプチャ準備ボタンを押すと利用可能です</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右側: コントロールとAI提案 -->
+      <div class="right-panel">
+        <!-- 右上: 設定パネル -->
+        <section class="config-panel" aria-label="設定パネル">
+          <div class="config-group">
+            <label for="target-app-select">監視対象アプリケーション</label>
+            <div class="smart-select-container">
+              <select id="target-app-select" class="smart-select">
+                <option value="" disabled selected>アプリケーションを選択</option>
+              </select>
+              <button id="refresh-apps" class="btn-refresh" type="button" title="アプリ一覧を更新" aria-label="アプリケーション一覧を更新">
+                <span class="refresh-icon">🔄</span>
+              </button>
+            </div>
+            <div class="select-info" id="select-info"></div>
+          </div>
+          
+          <div class="config-group">
+            <label for="adapter-select">MCPアダプター(準備中)</label>
+            <select id="adapter-select" class="adapter-select">
+              <option value="loading">読み込み中...</option>
+            </select>
+          </div>
+
+          <div class="config-actions">
+            <button id="start-capture" class="btn btn-primary" aria-label="キャプチャを準備">
+              <span class="btn-icon">▶️</span>
+              キャプチャ準備
+            </button>
+            <button id="stop-capture" class="btn btn-secondary" disabled aria-label="キャプチャを停止">
+              <span class="btn-icon">⏹️</span>
+              停止
+            </button>
+            <button id="manual-capture" class="btn btn-accent" disabled aria-label="手動でキャプチャ">
+              <span class="btn-icon">📷</span>
+              手動キャプチャ
+            </button>
+          </div>
+        </section>
+
+        <!-- 右下: AI提案パネル -->
+        <section class="proposals-panel" aria-labelledby="proposals-heading">
+          <div class="panel-header">
+            <h2 id="proposals-heading">AI提案</h2>
+            <div class="panel-info">
+              <span class="info-item">総数: <span id="proposal-count">0</span></span>
+              <span class="info-item">採用: <span id="adopted-count">0</span></span>
+              <span class="info-item">未決: <span id="pending-count">0</span></span>
+            </div>
+          </div>
+          
+          <div class="proposals-container" id="proposals-container">
+            <div class="placeholder-content">
+              <div class="placeholder-icon">🤖</div>
+              <p class="placeholder-text">AI提案を待機中</p>
+              <p class="placeholder-subtitle">現在の画面に対する改善提案はありません</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- フッター -->
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span class="app-version" id="app-version">v1.0.0</span>
+      <span class="separator">|</span>
+      <span class="memory-info">メモリ: <span id="memory-usage">-</span> MB</span>
+    </div>
+    <div class="footer-right">
+      <button id="settings-btn" class="btn-icon-only" title="設定" aria-label="設定を開く">
+        <span>⚙️</span>
+      </button>
+      <button id="help-btn" class="btn-icon-only" title="ヘルプ" aria-label="ヘルプを開く">
+        <span>❓</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- 設定情報ポップアップ -->
+  <div id="settings-popup" class="settings-popup" style="display: none;">
+    <div class="settings-popup-content">
+      <div class="settings-popup-header">
+        <h3>設定情報</h3>
+        <button id="settings-popup-close" class="settings-popup-close" title="閉じる" aria-label="設定ポップアップを閉じる">&times;</button>
+      </div>
+      <div class="settings-popup-body">
+        <div class="settings-item">
+          <label>共有データフォルダ:</label>
+          <div class="path-display" id="shared-data-path">読み込み中...</div>
+        </div>
+        <div class="settings-note">
+          <p class="note-text">💡 パスを変更するには、プロジェクトルートの<strong>.env</strong>ファイル内の<br><code>APP_VISION_SHARED_DATA</code>を編集してアプリを再起動してください。</p>
+        </div>
+        <div class="settings-actions">
+          <button id="open-folder-btn" class="btn btn-accent btn-small" aria-label="共有データフォルダを開く">
+            <span class="btn-icon">📁</span>
+            フォルダを開く
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ヘルプ情報ポップアップ -->
+  <div id="help-popup" class="settings-popup" style="display: none;">
+    <div class="settings-popup-content">
+      <div class="settings-popup-header">
+        <h3>ヘルプ情報</h3>
+        <button id="help-popup-close" class="settings-popup-close" title="閉じる" aria-label="ヘルプポップアップを閉じる">&times;</button>
+      </div>
+      <div class="settings-popup-body">
+        <div class="help-section">
+          <h4>基本操作</h4>
+          <ul class="help-list">
+            <li>🎯 <strong>監視対象選択</strong>：ドロップダウンからアプリを選択</li>
+            <li>▶️ <strong>キャプチャ準備</strong>：自動監視を開始</li>
+            <li>📷 <strong>手動キャプチャ</strong>：任意のタイミングで画面取得</li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h4>AI提案について</h4>
+          <ul class="help-list">
+            <li>🤖 画面を解析してUI改善提案を生成</li>
+            <li>⭕ 採用ボタンで提案を受け入れ</li>
+            <li>❌ 却下ボタンで提案を削除</li>
+            <li>✅ 完了ボタンで採用済み提案をクローズ</li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h4>設定</h4>
+          <ul class="help-list">
+            <li>⚙️ 設定ボタンで共有フォルダ確認</li>
+            <li>📁 フォルダボタンでデータ保存先を開く</li>
+          </ul>
+        </div>
+        <div class="settings-note">
+          <p class="note-text">📚 詳細なドキュメントは今後追加予定です。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../renderer/renderer.js"></script>
+</body>
+</html>
