@@ -232,6 +232,16 @@ class AppVisionRenderer {
   // ===== グローバル公開用メソッド =====
   
   /**
+   * 提案詳細の表示（グローバル公開用）
+   */
+  public showProposalDetail(index: number): void {
+    const proposal = this.eventHandlers.getProposalByIndex(index);
+    if (proposal) {
+      this.uiController.showProposalDetailModal(proposal);
+    }
+  }
+
+  /**
    * 提案の採用（グローバル公開用）
    */
   public adoptProposal(index: number): void {

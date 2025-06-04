@@ -1,0 +1,125 @@
+/**
+ * App Vision MCP - Extensions Styles
+ * リリース後追加機能用スタイル
+ */
+
+/* ===== 詳細ボタン用スタイル ===== */
+.btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: var(--text-white);
+}
+
+.btn-info:hover:not(:disabled) {
+  background-color: #138496;
+  border-color: #117a8b;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== 提案詳細モーダル ===== */
+.proposal-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.proposal-detail-modal.show { opacity: 1; visibility: visible; }
+
+.proposal-detail-modal-content {
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.proposal-detail-modal.show .proposal-detail-modal-content { transform: scale(1); }
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.modal-close:hover { color: var(--text-primary); background-color: var(--bg-hover); }
+
+.modal-body { padding: var(--spacing-lg); max-height: calc(80vh - 120px); overflow-y: auto; }
+
+.detail-section { margin-bottom: var(--spacing-lg); }
+.detail-section:last-child { margin-bottom: 0; }
+
+.detail-section-title {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.proposal-description-full { margin: 0 0 var(--spacing-md) 0; line-height: 1.6; color: var(--text-primary); }
+
+.expected-benefit {
+  margin: 0;
+  padding: var(--spacing-md);
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--color-accent);
+  color: var(--text-primary);
+}
+
+.implementation-steps { margin: 0; padding-left: var(--spacing-lg); list-style: decimal; }
+.implementation-step { margin-bottom: var(--spacing-sm); line-height: 1.6; color: var(--text-primary); }
+.implementation-step:last-child { margin-bottom: 0; }
+
+.notes-subsection { margin-bottom: var(--spacing-md); }
+.notes-subsection:last-child { margin-bottom: 0; }
+.notes-subsection h5 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+}
+
+.tips-list { margin: 0; padding-left: var(--spacing-lg); list-style: disc; }
+.tips-list li { margin-bottom: var(--spacing-xs); line-height: 1.5; color: var(--text-primary); }
+.tips-list li:last-child { margin-bottom: 0; }
+.notes-subsection p { margin: 0; line-height: 1.6; color: var(--text-primary); }

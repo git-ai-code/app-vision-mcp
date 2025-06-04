@@ -398,6 +398,14 @@ export class EventHandlers {
   }
 
   /**
+   * インデックスによる提案の取得
+   */
+  public getProposalByIndex(index: number): ProposalWithStatus | null {
+    if (index < 0 || index >= this.proposals.length) return null;
+    return this.proposals[index];
+  }
+
+  /**
    * 提案の採用
    */
   public adoptProposal(index: number): void {
@@ -509,6 +517,14 @@ export class EventHandlers {
     
     if (totalCount === 0) {
       this.uiController.showNotification('info', '情報', '削除対象の提案がありません');
+      return;
+    }
+    
+    // 確認ダイアログ表示
+    const confirmed = confirm(`全ての提案（${visibleCount}件）を削除しますか？\n\nこの操作は取り消せません。`);
+    
+    if (!confirmed) {
+      this.uiController.showNotification('info', 'キャンセル', '全提案削除がキャンセルされました');
       return;
     }
     

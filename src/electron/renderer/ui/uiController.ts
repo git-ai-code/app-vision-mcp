@@ -86,6 +86,7 @@ export class UIController {
         <p class="proposal-description">${escapeHtml(proposal.description || '')}</p>
         ${proposal.reason ? `<p class="proposal-reason">理由: ${escapeHtml(proposal.reason)}</p>` : ''}
         <div class="proposal-actions">
+          ${this.createDetailButton(index)}
           <button class="btn btn-primary btn-sm" onclick="appRenderer.adoptProposal(${index})">
             採用
           </button>
@@ -125,18 +126,20 @@ export class UIController {
       
       let buttonsHTML = '';
       if (proposal.status === 'adopted') {
-        // 採用済み提案には個別完了ボタン
+        // 採用済み提案には詳細・完了ボタン
         buttonsHTML = `
           <div class="proposal-actions adopted-actions">
+            ${this.createDetailButton(index)}
             <button class="btn btn-success btn-sm" onclick="appRenderer.completeIndividualProposal(${index})">
               完了
             </button>
           </div>
         `;
       } else {
-        // 未処理提案には採用・却下ボタン
+        // 未処理提案には詳細・採用・却下ボタン
         buttonsHTML = `
           <div class="proposal-actions">
+            ${this.createDetailButton(index)}
             <button class="btn btn-primary btn-sm" onclick="appRenderer.adoptProposal(${index})">
               採用
             </button>
@@ -313,6 +316,175 @@ export class UIController {
    */
   public clearCapturedImage(): void {
     this.captureController.clearCapturedImage();
+  }
+
+  /**
+   * 詳細ボタンHTML生成
+   */
+  private createDetailButton(index: number): string {
+    return `<button class="btn btn-info btn-sm" onclick="appRenderer.showProposalDetail(${index})">詳細</button>`;
+  }
+
+  /**
+   * JSON詳細情報を汎用的に構築
+   */
+  private buildDetailSections(proposal: any): string {
+    const excludedKeys = ['title', 'description', 'id', 'category', 'priority']; // メイン表示で使用済み
+    let sections = '';
+    
+    // 各プロパティを動的に処理
+    Object.keys(proposal).forEach(key => {
+      if (excludedKeys.includes(key)) return;
+      
+      const value = proposal[key];
+      if (!value) return;
+      
+      sections += this.buildGenericSection(key, value);
+    });
+    
+    return sections;
+  }
+
+  /**
+   * 汎用セクション構築
+   */
+  private buildGenericSection(key: string, value: any): string {
+    const sectionTitle = this.formatSectionTitle(key);
+    const content = this.formatSectionContent(value);
+    
+    if (!content) return '';
+    
+    return `
+      <div class="detail-section">
+        <h4 class="detail-section-title">${sectionTitle}</h4>
+        ${content}
+      </div>
+    `;
+  }
+
+  /**
+   * セクションタイトル整形
+   */
+  private formatSectionTitle(key: string): string {
+    const titleMap: {[key: string]: string} = {
+      implementation: '📋 実装手順',
+      expected_benefit: '🎯 期待効果',
+      additional_notes: '💡 追加情報',
+      reason: '💭 理由'
+    };
+    
+    return titleMap[key] || `📄 ${key.replace(/_/g, ' ').toUpperCase()}`;
+  }
+
+  /**
+   * セクション内容整形
+   */
+  private formatSectionContent(value: any): string {
+    if (Array.isArray(value)) {
+      return `<ol class="implementation-steps">${value.map(item => `<li class="implementation-step">${escapeHtml(String(item))}</li>`).join('')}</ol>`;
+    }
+    
+    if (typeof value === 'object' && value !== null) {
+      return this.formatObjectContent(value);
+    }
+    
+    return `<p class="proposal-description-full">${escapeHtml(String(value))}</p>`;
+  }
+
+  /**
+   * オブジェクト内容整形
+   */
+  private formatObjectContent(obj: any): string {
+    let content = '';
+    
+    Object.keys(obj).forEach(subKey => {
+      const subValue = obj[subKey];
+      if (!subValue) return;
+      
+      const subTitle = subKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      
+      if (Array.isArray(subValue)) {
+        content += `
+          <div class="notes-subsection">
+            <h5>${subTitle}</h5>
+            <ul class="tips-list">${subValue.map(item => `<li>${escapeHtml(String(item))}</li>`).join('')}</ul>
+          </div>
+        `;
+      } else {
+        content += `
+          <div class="notes-subsection">
+            <h5>${subTitle}</h5>
+            <p>${escapeHtml(String(subValue))}</p>
+          </div>
+        `;
+      }
+    });
+    
+    return content;
+  }
+
+  /**
+   * 提案詳細モーダルの表示
+   */
+  public showProposalDetailModal(proposal: any): void {
+    // 既存のモーダルがあれば削除
+    const existingModal = document.querySelector('.proposal-detail-modal');
+    if (existingModal) existingModal.remove();
+
+    // モーダル要素を作成
+    const modal = document.createElement('div');
+    modal.className = 'proposal-detail-modal';
+    
+    const modalContent = document.createElement('div');
+    modalContent.className = 'proposal-detail-modal-content';
+    
+    // HTML構築（汎用版）
+    modalContent.innerHTML = `
+      <div class="modal-header">
+        <h3 class="modal-title">${escapeHtml(proposal.title || 'AI提案の詳細')}</h3>
+        <button class="modal-close" aria-label="詳細を閉じる">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4 class="detail-section-title">📝 概要</h4>
+          <p class="proposal-description-full">${escapeHtml(proposal.description || '')}</p>
+        </div>
+        ${this.buildDetailSections(proposal)}
+      </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    
+    // イベント設定と表示
+    this.setupModalEvents(modal, modalContent);
+    document.body.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('show'));
+  }
+
+  /**
+   * モーダルイベント設定
+   */
+  private setupModalEvents(modal: HTMLElement, modalContent: HTMLElement): void {
+    const closeModal = () => {
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.remove();
+        document.removeEventListener('keydown', escKeyHandler);
+      }, 300);
+    };
+    
+    const escKeyHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+    
+    const closeButton = modalContent.querySelector('.modal-close');
+    if (closeButton) closeButton.addEventListener('click', closeModal);
+    
+    document.addEventListener('keydown', escKeyHandler);
   }
 
   /**
