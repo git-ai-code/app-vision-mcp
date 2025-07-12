@@ -11,7 +11,7 @@
 Windows Graphics Capture APIを活用してWindows環境のアプリ画面を高品質キャプチャし、AIとの統合により画面内容を深く理解して、創作・開発・学習をサポートする知的な提案を生成します。
 ~~正直な所、手動でスクショしてAIに画像のパスを渡すのをちょっとだけ自動化しているだけのツールです。~~
 
-**実行環境**: Windows直接実行およびWSL(Windows Subsystem for Linux)環境でのMCPコマンド実行に対応しています。
+**実行環境**: Windows環境でのMCPコマンド実行に対応しています。
 
 ![App Vision MCP Screenshot1](images/app-vision-mcp-overview1.png)
 
@@ -50,8 +50,8 @@ Windows Graphics Capture APIを活用してWindows環境のアプリ画面を高
 
 - **Node.js 18+** with npm
 - **TypeScript 5.0+**
-- **MCP対応AI**: Claude Desktop または WSL上のClaude Code
-- **Windows OS**: Windows 11、WSL
+- **MCP対応AI**: Claude Desktop または Claude Code
+- **Windows OS**: Windows 11
 
 > **注意**: 現在はWindows専用です。macOS対応は現時点では対応未定です。  
 > **macOS移植について**: 技術的検討資料として [macOS移植ガイド](README/macos-porting-guide.md) を参照してください。
@@ -149,11 +149,7 @@ npm start
 - `startupTimeout`: 30秒の起動タイムアウト（Electronアプリ連携のため）
 - `restartOnFailure`: 失敗時の自動再起動
 
-#### Claude Code (WSL)
-
-> **WSLでの `/mnt/c` について**: WSL（Windows Subsystem for Linux）では、WindowsのCドライブが `/mnt/c/` としてマウントされます。これによりLinux環境からWindowsファイルシステムにアクセスできます。
-> 
-> **詳細なWSLセットアップ**: [WSL環境でのClaude Code + App Vision MCP セットアップガイド](https://zenn.dev/git_ai_code/articles/wsl-claude-code-setup-guide) で詳しく説明しています。
+#### Claude Code (Windows)
 
 MCP設定ファイルに追加：
 
@@ -162,10 +158,10 @@ MCP設定ファイルに追加：
   "mcpServers": {
     "app-vision-mcp": {
       "command": "node",
-      "args": ["/mnt/c/<path-to-project>/app-vision-mcp/dist/index.js"],
+      "args": ["C:<path-to-project>/app-vision-mcp/dist/index.js"],
       "type": "stdio",
       "env": {
-        "APP_VISION_SHARED_DATA": "/mnt/c/<path-to-project>/shared-data"
+        "APP_VISION_SHARED_DATA": "C:<path-to-project>/shared-data"
       }
     }
   }
@@ -181,10 +177,10 @@ MCP設定ファイルに追加：
   "mcpServers": {
     "app-vision-mcp": {
       "command": "node",
-      "args": ["/mnt/c/<path-to-project>/app-vision-mcp/dist/index.js"],
+      "args": ["C:<path-to-project>/app-vision-mcp/dist/index.js"],
       "type": "stdio",
       "env": {
-        "APP_VISION_SHARED_DATA": "/mnt/c/<path-to-project>/shared-data"
+        "APP_VISION_SHARED_DATA": "C:<path-to-project>/shared-data"
       },
       "startupTimeout": 30000,
       "restartOnFailure": true
